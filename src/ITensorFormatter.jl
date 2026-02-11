@@ -135,9 +135,6 @@ function organize_import_block(input)
     content *= content_to_append * src[(last_pos + 1):end]
 
     return content
-
-    write("test_output.jl", content)
-    return Runic.main(["test_output.jl"])
 end
 
 function (@main)(ARGS)
