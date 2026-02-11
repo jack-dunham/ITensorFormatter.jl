@@ -1,0 +1,12 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Literate = "98b081ad-f1c9-55d3-8b20-4c87d4299306"
+ITensorFormatter = "b6bf39f1-c9d3-4bad-aad8-593d802f65fd"
+
+[sources]
+ITensorFormatter = {path = ".."}
+
+[compat]
+Documenter = "1"
+Literate = "2"
+ITensorFormatter = "0.1"

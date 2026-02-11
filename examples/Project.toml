@@ -1,0 +1,8 @@
+[deps]
+ITensorFormatter = "b6bf39f1-c9d3-4bad-aad8-593d802f65fd"
+
+[sources]
+ITensorFormatter = {path = ".."}
+
+[compat]
+ITensorFormatter = "0.1"
