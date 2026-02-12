@@ -1,5 +1,11 @@
 module ITensorFormatter
 
+if VERSION >= v"1.11.0-DEV.469"
+    let str = "public main"
+        eval(Meta.parse(str))
+    end
+end
+
 using JuliaFormatter: JuliaFormatter
 using JuliaSyntax: JuliaSyntax, @K_str, SyntaxNode, children, kind, parseall, span
 using Runic: Runic
@@ -126,6 +132,15 @@ function organize_import_block(input)
     return content
 end
 
+"""
+    ITensorFormatter.main(argv)
+
+Format Julia source files. Primarily formats using Runic formatting, but additionally
+organizes using/import statements by merging adjacent blocks, sorting modules and symbols,
+and line-wrapping. Accepts file paths and directories as arguments. Options starting with
+`--` are forwarded to Runic, see the
+[Runic documentation](https://github.com/fredrikekre/Runic.jl) for more details.
+"""
 function main(argv)
     inputfiles = String[]
     x = filter(!startswith("--"), argv)
