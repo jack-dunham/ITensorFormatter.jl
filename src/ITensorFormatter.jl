@@ -114,7 +114,7 @@ function organize_import_block(input)
     statement_range = char_range(siblings[1])
     first_pos = first(char_range(siblings[1]))
 
-    content = src[1:first_pos-1] * formatted
+    content = src[1:(first_pos - 1)] * formatted
 
     content_to_append = ""
 
@@ -123,14 +123,14 @@ function organize_import_block(input)
     # Get the content between the using/import statements
     for s in siblings[2:end]
         statement_range = char_range(s)
-        content_to_append *= src[last_pos + 1:(first(statement_range) - 1)]
+        content_to_append *= src[(last_pos + 1):(first(statement_range) - 1)]
         last_pos = last(statement_range)
     end
 
     if length(content_to_append) > 1
         content_to_append = "\n" * content_to_append
     end
-    
+
     # Tack this onto the end
     content *= content_to_append * src[(last_pos + 1):end]
 
@@ -146,6 +146,6 @@ function (@main)(ARGS)
     end
     Runic.main(ARGS)
     return 0
-end 
+end
 
 end
