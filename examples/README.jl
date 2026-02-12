@@ -52,7 +52,7 @@ julia -e 'using Pkg; Pkg.Apps.add("ITensorFormatter")'
 ```sh
 # Format all files in-place in the current directory (recursively)
 # !! DON'T DO THIS FROM YOUR HOME DIRECTORY !!
-itfmt --inplace .
+itfmt .
 ```
 =#
 
