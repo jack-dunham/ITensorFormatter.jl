@@ -11,7 +11,7 @@ ITensorFormatter = {path = ".."}
 
 [compat]
 Aqua = "0.8"
-ITensorFormatter = "0.1"
+ITensorFormatter = "0.2"
 JuliaSyntax = "0.4.10"
 SafeTestsets = "0.1"
 Suppressor = "0.2"
