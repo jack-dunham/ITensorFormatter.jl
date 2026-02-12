@@ -1,8 +1,8 @@
 module ITensorFormatter
 
-using JuliaFormatter
-using JuliaSyntax: @K_str, JuliaSyntax, SyntaxNode, children, kind, parseall, span
-using Runic
+using JuliaFormatter: JuliaFormatter
+using JuliaSyntax: JuliaSyntax, @K_str, SyntaxNode, children, kind, parseall, span
+using Runic: Runic
 
 function is_using_or_import(x)
     return kind(x) === K"using" || kind(x) === K"import"
@@ -22,7 +22,7 @@ function find_using_or_import(x)
     end
 end
 
-char_range(x) = x.position:(x.position + span(x))
+char_range(x) = x.position:(x.position + span(x) - 1)
 
 function organize_import_file(f)
     jst = parseall(SyntaxNode, read(f, String))
@@ -33,7 +33,7 @@ function organize_import_block(input)
     # Collect all sibling blocks that are also using/import expressions
 
     x = find_using_or_import(input)
-    isnothing(x) && return
+    isnothing(x) && return JuliaSyntax.sourcetext(input)
 
     siblings = []
 
@@ -75,8 +75,13 @@ function organize_import_block(input)
                 end
             elseif kind(a) === K"."
                 push!(isusing ? using_mods : import_mods, module_join(a))
+            elseif kind(a) === K"importpath"
+                push!(isusing ? using_mods : import_mods, String(children(a)[1].val))
+            elseif !isusing && kind(a) === K"as"
+                a_args = children(a)
+                push!(import_mods, join((children(a_args[1])[1].val, "as", a_args[2]), " "))
             else
-                error("unreachable?")
+                error("Unexpected syntax in using/import statement.")
             end
         end
     end
@@ -102,7 +107,7 @@ function organize_import_block(input)
     end
     io = IOBuffer()
     join(io, sort!(import_lines), "\n")
-    length(import_lines) > 0 && print(io, "\n\n")
+    length(import_lines) > 0 && length(using_lines) > 0 && print(io, "\n")
     join(io, sort!(using_lines), "\n")
     str_to_fmt = String(take!(io))
 
@@ -111,41 +116,36 @@ function organize_import_block(input)
 
     src = JuliaSyntax.sourcetext(input)
 
-    statement_range = char_range(siblings[1])
     first_pos = first(char_range(siblings[1]))
+    last_pos = last(char_range(siblings[end]))
 
-    content = src[1:first_pos-1] * formatted
-
-    content_to_append = ""
-
-    last_pos = last(char_range(siblings[1]))
-
-    # Get the content between the using/import statements
-    for s in siblings[2:end]
-        statement_range = char_range(s)
-        content_to_append *= src[last_pos + 1:(first(statement_range) - 1)]
-        last_pos = last(statement_range)
-    end
-
-    if length(content_to_append) > 1
-        content_to_append = "\n" * content_to_append
-    end
-    
-    # Tack this onto the end
-    content *= content_to_append * src[(last_pos + 1):end]
+    content = src[1:(first_pos - 1)] * chomp(formatted) * src[(last_pos + 1):end]
 
     return content
 end
 
-function (@main)(ARGS)
-    for file in ARGS
-        _, ext = splitext(file)
-        ext == ".jl" || error("Only .jl files are supported")
-        content = organize_import_file(file)
-        write(file, content)
+function main(argv)
+    inputfiles = String[]
+    x = filter(!startswith("--"), argv)
+    for x in argv
+        if startswith(x, "--")
+            # Ignore options for now, they are assumed to be for Runic.
+        elseif isdir(x)
+            Runic.scandir!(inputfiles, x)
+        else # isfile(x)
+            push!(inputfiles, x) # Assume it is a file for now
+        end
     end
-    Runic.main(ARGS)
+    for inputfile in inputfiles
+        content = organize_import_file(inputfile)
+        write(inputfile, content)
+    end
+    Runic.main(argv)
     return 0
-end 
+end
+
+@static if isdefined(Base, Symbol("@main"))
+    @main
+end
 
 end
