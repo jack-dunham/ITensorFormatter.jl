@@ -10,6 +10,38 @@ using JuliaFormatter: JuliaFormatter
 using JuliaSyntax: JuliaSyntax, @K_str, SyntaxNode, children, kind, parseall, span
 using Runic: Runic
 
+# JuliaFormatter options chosen to be compatible with Runic.
+# JuliaFormatter handles line wrapping (which Runic doesn't do),
+# then Runic runs last to canonicalize everything else.
+const JULIAFORMATTER_OPTIONS = (
+    style = JuliaFormatter.DefaultStyle(),
+    indent = 4,
+    margin = 92,
+    always_for_in = true,
+    # Disable semantic transformations (Runic is authoritative)
+    always_use_return = false,
+    import_to_using = false,
+    pipe_to_function_call = false,
+    short_to_long_function_def = false,
+    long_to_short_function_def = false,
+    conditional_to_if = false,
+    short_circuit_to_if = false,
+    # Disable whitespace changes (Runic is authoritative)
+    whitespace_typedefs = false,
+    whitespace_ops_in_indices = false,
+    whitespace_in_kwargs = true,
+    # Disable annotation/structural changes
+    annotate_untyped_fields_with_any = false,
+    format_docstrings = false,
+    remove_extra_newlines = false,
+    indent_submodule = false,
+    separate_kwargs_with_semicolon = false,
+    # Line-wrapping-related options
+    trailing_comma = true,
+    trailing_zero = true,
+    join_lines_based_on_source = true,
+)
+
 function is_using_or_import(x)
     return kind(x) === K"using" || kind(x) === K"import"
 end
@@ -92,9 +124,7 @@ function organize_import_block(siblings, node_text)
     join(io, sort!(import_lines), "\n")
     length(import_lines) > 0 && length(using_lines) > 0 && print(io, "\n")
     join(io, sort!(using_lines), "\n")
-    str_to_fmt = String(take!(io))
-
-    return JuliaFormatter.format_text(str_to_fmt; join_lines_based_on_source = true)
+    return String(take!(io))
 end
 
 function organize_import_blocks(input)
@@ -224,12 +254,15 @@ function main(argv)
         end
     end
     isempty(inputfiles) && return 0
+    # Pass 1: Organize import/using blocks
     for inputfile in inputfiles
         content = organize_import_blocks_file(inputfile)
         write(inputfile, content)
     end
-    pushfirst!(inputfiles, "--inplace")
-    Runic.main(inputfiles)
+    # Pass 2: Line wrapping via JuliaFormatter
+    JuliaFormatter.format(inputfiles; JULIAFORMATTER_OPTIONS...)
+    # Pass 3: Canonicalize via Runic
+    Runic.main(["--inplace"; inputfiles])
     return 0
 end
 
