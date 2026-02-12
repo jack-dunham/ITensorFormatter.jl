@@ -24,7 +24,7 @@ const JULIAFORMATTER_OPTIONS = (
     import_to_using = true,
     pipe_to_function_call = true,
     short_to_long_function_def = true,
-    long_to_short_function_def = true,
+    long_to_short_function_def = false,
     conditional_to_if = true,
     short_circuit_to_if = false,
     # Whitespace options consistent with Runic
@@ -46,9 +46,7 @@ const JULIAFORMATTER_OPTIONS = (
     join_lines_based_on_source = true,
 )
 
-function is_using_or_import(x)
-    return kind(x) === K"using" || kind(x) === K"import"
-end
+is_using_or_import(x) = kind(x) === K"using" || kind(x) === K"import"
 
 function find_using_or_import(x)
     if is_using_or_import(x)
@@ -172,23 +170,23 @@ const ITENSORFORMATTER_VERSION = pkgversion(@__MODULE__)
 # Print a typical cli program help message
 function print_help()
     io = stdout
-    printstyled(io, "NAME", bold = true)
+    printstyled(io, "NAME"; bold = true)
     println(io)
     println(io, "       ITensorFormatter.main - format Julia source code")
     println(io)
-    printstyled(io, "SYNOPSIS", bold = true)
+    printstyled(io, "SYNOPSIS"; bold = true)
     println(io)
     println(io, "       julia -m ITensorFormatter [<options>] <path>...")
     println(io)
-    printstyled(io, "DESCRIPTION", bold = true)
+    printstyled(io, "DESCRIPTION"; bold = true)
     println(io)
     println(
         io, """
                `ITensorFormatter.main` (typically invoked as `julia -m ITensorFormatter`)
                formats Julia source code using the ITensorFormatter.jl formatter.
-        """
+        """,
     )
-    printstyled(io, "OPTIONS", bold = true)
+    printstyled(io, "OPTIONS"; bold = true)
     println(io)
     println(
         io, """
@@ -201,7 +199,7 @@ function print_help()
 
                --version
                    Print ITensorFormatter and julia version information.
-        """
+        """,
     )
     return
 end
@@ -223,6 +221,7 @@ organizes using/import statements by merging adjacent blocks, sorting modules an
 and line-wrapping. Accepts file paths and directories as arguments.
 
 # Examples
+
 ```julia-repl
 julia> using ITensorFormatter: ITensorFormatter
 
