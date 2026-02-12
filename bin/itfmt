@@ -1,0 +1,13 @@
+#!/bin/sh
+
+# A simple driver script for invoking ITensorFormatter's main function. Put this script
+# somewhere in PATH and make sure it is executable. The script expects ITensorFormatter to
+# be installed in the `@itfmt` shared environment and julia to be available in
+# PATH. See installation instructions in the repository README for more
+# details.
+#
+# Repository: https://github.com/ITensor/ITensorFormatter.jl
+# SPDX-License-Identifier: Apache-2.0
+
+export JULIA_LOAD_PATH="@itfmt"
+exec julia --startup-file=no -e 'using ITensorFormatter; exit(ITensorFormatter.main(ARGS))' -- "$@"

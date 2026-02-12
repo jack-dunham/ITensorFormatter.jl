@@ -7,6 +7,13 @@
 # [![code style: runic](https://img.shields.io/badge/code_style-%E1%9A%B1%E1%9A%A2%E1%9A%BE%E1%9B%81%E1%9A%B2-black)](https://github.com/fredrikekre/Runic.jl)
 # [![Aqua](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
+# ITensorFormatter.jl is a code formatting tool for Julia source files. It primarily
+# uses the [Runic.jl](https://github.com/fredrikekre/Runic.jl) code formatter, but also
+# organizes using/import statements by merging adjacent blocks, sorting modules and
+# symbols, and line-wrapping (similar to, and based off of, the using/import statement
+# organization functionality in
+# [LanguageServer.jl](https://github.com/julia-vscode/LanguageServer.jl)).
+
 # ## Support
 #
 # {CCQ_LOGO}
@@ -33,15 +40,30 @@ julia> Pkg.Registry.add(url = "git@github.com:ITensor/ITensorRegistry.git")
 =#
 # if you want to use SSH credentials, which can make it so you don't have to enter your Github ursername and password when registering packages.
 
-# Then, the package can be added as usual through the package manager:
-
+# In Julia v1.12 and later, ITensorFormatter should be installed as a
+# [Pkg app](https://pkgdocs.julialang.org/dev/apps/):
 #=
-```julia
-julia> Pkg.add("ITensorFormatter")
+```sh
+julia -e 'using Pkg; Pkg.Apps.add("ITensorFormatter")'
+```
+=#
+# Assuming `~/.julia/bin` is in your `PATH` you can now invoke `itfmt`, e.g.:
+#=
+```sh
+# Format all files in-place in the current directory (recursively)
+# !! DON'T DO THIS FROM YOUR HOME DIRECTORY !!
+itfmt --inplace .
 ```
 =#
 
-# ## Examples
+# ### Legacy installation
 
-using ITensorFormatter: ITensorFormatter
-# Examples go here.
+# In Julia v1.11 and earlier (or if you don't want to use a Pkg app), ITensorFormatter can
+# also be installed manually with Julia's package manager:
+# ```sh
+# # Install ITensorFormatter
+# julia --project=@itfmt --startup-file=no -e 'using Pkg; Pkg.add("ITensorFormatter")'
+# # Install the itfmt shell script
+# curl -fsSL -o ~/.local/bin/itfmt https://raw.githubusercontent.com/ITensor/ITensorFormatter.jl/refs/heads/main/bin/itfmt
+# chmod +x ~/.local/bin/itfmt
+# ```
