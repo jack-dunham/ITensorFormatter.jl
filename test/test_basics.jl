@@ -4,7 +4,7 @@ using Test: @test, @testset
 
 function organize(s)
     jst = parseall(SyntaxNode, s)
-    return ITensorFormatter.organize_import_block(jst)
+    return ITensorFormatter.organize_import_blocks(jst)
 end
 
 @testset "ITensorFormatter" begin
@@ -122,5 +122,12 @@ end
     @testset "mixed bare and colon imports" begin
         result = organize("import Foo\nimport Bar: baz\n")
         @test result == "import Bar: baz\nimport Foo\n"
+    end
+
+    @testset "multiple separate import blocks" begin
+        input = "using Baz: baz\nusing Foo: foo\nx = 1\nusing Zebra: z, a\nusing Alpha: a\n"
+        result = organize(input)
+        @test result ==
+            "using Baz: baz\nusing Foo: foo\nx = 1\nusing Alpha: a\nusing Zebra: a, z\n"
     end
 end
