@@ -132,32 +132,103 @@ function organize_import_block(input)
     return content
 end
 
+const ITENSORFORMATTER_VERSION = pkgversion(@__MODULE__)
+
+# Print a typical cli program help message
+function print_help()
+    io = stdout
+    printstyled(io, "NAME", bold = true)
+    println(io)
+    println(io, "       ITensorFormatter.main - format Julia source code")
+    println(io)
+    printstyled(io, "SYNOPSIS", bold = true)
+    println(io)
+    println(io, "       julia -m ITensorFormatter [<options>] <path>...")
+    println(io)
+    printstyled(io, "DESCRIPTION", bold = true)
+    println(io)
+    println(
+        io, """
+               `ITensorFormatter.main` (typically invoked as `julia -m ITensorFormatter`)
+               formats Julia source code using the ITensorFormatter.jl formatter.
+        """
+    )
+    printstyled(io, "OPTIONS", bold = true)
+    println(io)
+    println(
+        io, """
+               <path>...
+                   Input path(s) (files and/or directories) to process. For directories,
+                   all files (recursively) with the '*.jl' suffix are used as input files.
+
+               --help
+                   Print this message.
+
+               --version
+                   Print ITensorFormatter and julia version information.
+        """
+    )
+    return
+end
+
+function print_version()
+    print(stdout, "itfmt version ")
+    print(stdout, ITENSORFORMATTER_VERSION)
+    print(stdout, ", julia version ")
+    print(stdout, VERSION)
+    println(stdout)
+    return
+end
+
 """
     ITensorFormatter.main(argv)
 
 Format Julia source files. Primarily formats using Runic formatting, but additionally
 organizes using/import statements by merging adjacent blocks, sorting modules and symbols,
-and line-wrapping. Accepts file paths and directories as arguments. Options starting with
-`--` are forwarded to Runic, see the
-[Runic documentation](https://github.com/fredrikekre/Runic.jl) for more details.
+and line-wrapping. Accepts file paths and directories as arguments.
+
+# Examples
+```julia-repl
+julia> using ITensorFormatter: ITensorFormatter
+
+julia> ITensorFormatter.main(["."]);
+
+julia> ITensorFormatter.main(["file1.jl", "file2.jl"]);
+
+```
 """
 function main(argv)
-    inputfiles = String[]
-    x = filter(!startswith("--"), argv)
-    for x in argv
-        if startswith(x, "--")
-            # Ignore options for now, they are assumed to be for Runic.
-        elseif isdir(x)
-            Runic.scandir!(inputfiles, x)
-        else # isfile(x)
-            push!(inputfiles, x) # Assume it is a file for now
+    argv_options = filter(startswith("--"), argv)
+    if !isempty(argv_options)
+        if "--help" in argv_options
+            print_help()
+            return 0
+        elseif "--version" in argv_options
+            print_version()
+            return 0
+        else
+            return error("Options not supported: `$argv_options`.")
         end
     end
+    # `argv` doesn't have any options, so treat all arguments as file/directory paths.
+    isempty(argv) && return error("No input paths provided.")
+    inputfiles = String[]
+    for x in argv
+        if isdir(x)
+            Runic.scandir!(inputfiles, x)
+        elseif isfile(x)
+            push!(inputfiles, x) # Assume it is a file for now
+        else
+            error("Input path is not a file or directory: `$x`.")
+        end
+    end
+    isempty(inputfiles) && return 0
     for inputfile in inputfiles
         content = organize_import_file(inputfile)
         write(inputfile, content)
     end
-    Runic.main(argv)
+    pushfirst!(inputfiles, "--inplace")
+    Runic.main(inputfiles)
     return 0
 end
 
