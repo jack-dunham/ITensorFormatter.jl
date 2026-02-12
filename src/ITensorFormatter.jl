@@ -10,9 +10,43 @@ using JuliaFormatter: JuliaFormatter
 using JuliaSyntax: JuliaSyntax, @K_str, SyntaxNode, children, kind, parseall, span
 using Runic: Runic
 
-function is_using_or_import(x)
-    return kind(x) === K"using" || kind(x) === K"import"
-end
+# JuliaFormatter options chosen to be compatible with Runic.
+# JuliaFormatter handles line wrapping (which Runic doesn't do),
+# then Runic runs last to canonicalize everything else.
+const JULIAFORMATTER_OPTIONS = (
+    style = JuliaFormatter.DefaultStyle(),
+    indent = 4,
+    margin = 92,
+    always_for_in = true,
+    for_in_replacement = "in",
+    # Semantic transformations consistent with Runic
+    always_use_return = true,
+    import_to_using = true,
+    pipe_to_function_call = true,
+    short_to_long_function_def = true,
+    long_to_short_function_def = false,
+    conditional_to_if = true,
+    short_circuit_to_if = false,
+    # Whitespace options consistent with Runic
+    whitespace_typedefs = true,
+    whitespace_ops_in_indices = true,
+    whitespace_in_kwargs = true,
+    # Annotation/structural changes
+    annotate_untyped_fields_with_any = true,
+    format_docstrings = true,
+    remove_extra_newlines = true,
+    indent_submodule = true,
+    separate_kwargs_with_semicolon = true,
+    surround_whereop_typeparameters = true,
+    disallow_single_arg_nesting = true,
+    normalize_line_endings = "unix",
+    # Line-wrapping-related options
+    trailing_comma = true,
+    trailing_zero = true,
+    join_lines_based_on_source = true,
+)
+
+is_using_or_import(x) = kind(x) === K"using" || kind(x) === K"import"
 
 function find_using_or_import(x)
     if is_using_or_import(x)
@@ -92,9 +126,7 @@ function organize_import_block(siblings, node_text)
     join(io, sort!(import_lines), "\n")
     length(import_lines) > 0 && length(using_lines) > 0 && print(io, "\n")
     join(io, sort!(using_lines), "\n")
-    str_to_fmt = String(take!(io))
-
-    return JuliaFormatter.format_text(str_to_fmt; join_lines_based_on_source = true)
+    return String(take!(io))
 end
 
 function organize_import_blocks(input)
@@ -138,23 +170,23 @@ const ITENSORFORMATTER_VERSION = pkgversion(@__MODULE__)
 # Print a typical cli program help message
 function print_help()
     io = stdout
-    printstyled(io, "NAME", bold = true)
+    printstyled(io, "NAME"; bold = true)
     println(io)
     println(io, "       ITensorFormatter.main - format Julia source code")
     println(io)
-    printstyled(io, "SYNOPSIS", bold = true)
+    printstyled(io, "SYNOPSIS"; bold = true)
     println(io)
     println(io, "       julia -m ITensorFormatter [<options>] <path>...")
     println(io)
-    printstyled(io, "DESCRIPTION", bold = true)
+    printstyled(io, "DESCRIPTION"; bold = true)
     println(io)
     println(
         io, """
                `ITensorFormatter.main` (typically invoked as `julia -m ITensorFormatter`)
                formats Julia source code using the ITensorFormatter.jl formatter.
-        """
+        """,
     )
-    printstyled(io, "OPTIONS", bold = true)
+    printstyled(io, "OPTIONS"; bold = true)
     println(io)
     println(
         io, """
@@ -167,7 +199,7 @@ function print_help()
 
                --version
                    Print ITensorFormatter and julia version information.
-        """
+        """,
     )
     return
 end
@@ -189,6 +221,7 @@ organizes using/import statements by merging adjacent blocks, sorting modules an
 and line-wrapping. Accepts file paths and directories as arguments.
 
 # Examples
+
 ```julia-repl
 julia> using ITensorFormatter: ITensorFormatter
 
@@ -224,12 +257,20 @@ function main(argv)
         end
     end
     isempty(inputfiles) && return 0
+    # Pass 1: Organize import/using blocks
     for inputfile in inputfiles
         content = organize_import_blocks_file(inputfile)
         write(inputfile, content)
     end
-    pushfirst!(inputfiles, "--inplace")
-    Runic.main(inputfiles)
+    # Pass 2: Formatting via JuliaFormatter
+    JuliaFormatter.format(inputfiles; JULIAFORMATTER_OPTIONS...)
+    # Pass 3: Re-organize imports (fix up any changes from JuliaFormatter, e.g. import_to_using)
+    for inputfile in inputfiles
+        content = organize_import_blocks_file(inputfile)
+        write(inputfile, content)
+    end
+    # Pass 4: Canonicalize via Runic
+    Runic.main(["--inplace"; inputfiles])
     return 0
 end
 

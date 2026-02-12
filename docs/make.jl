@@ -1,8 +1,8 @@
-using ITensorFormatter: ITensorFormatter
 using Documenter: Documenter, DocMeta, deploydocs, makedocs
+using ITensorFormatter: ITensorFormatter
 
 DocMeta.setdocmeta!(
-    ITensorFormatter, :DocTestSetup, :(using ITensorFormatter); recursive = true
+    ITensorFormatter, :DocTestSetup, :(using ITensorFormatter); recursive = true,
 )
 
 include("make_index.jl")
@@ -20,5 +20,5 @@ makedocs(;
 )
 
 deploydocs(;
-    repo = "github.com/ITensor/ITensorFormatter.jl", devbranch = "main", push_preview = true
+    repo = "github.com/ITensor/ITensorFormatter.jl", devbranch = "main", push_preview = true,
 )

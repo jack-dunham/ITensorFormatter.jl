@@ -1,5 +1,5 @@
-using ITensorFormatter: ITensorFormatter
 using Aqua: Aqua
+using ITensorFormatter: ITensorFormatter
 using Test: @testset
 
 @testset "Code quality (Aqua.jl)" begin
