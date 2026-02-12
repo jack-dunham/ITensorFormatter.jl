@@ -269,7 +269,9 @@ function main(argv)
         content = organize_import_blocks_file(inputfile)
         write(inputfile, content)
     end
-    # Pass 4: Canonicalize via Runic
+    # Pass 4: Format via JuliaFormatter again to fix import line wrapping
+    JuliaFormatter.format(inputfiles; JULIAFORMATTER_OPTIONS...)
+    # Pass 5: Canonicalize via Runic
     Runic.main(["--inplace"; inputfiles])
     return 0
 end
