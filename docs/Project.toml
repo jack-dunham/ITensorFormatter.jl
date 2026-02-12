@@ -9,4 +9,4 @@ ITensorFormatter = {path = ".."}
 [compat]
 Documenter = "1"
 Literate = "2"
-ITensorFormatter = "0.1"
+ITensorFormatter = "0.2"
