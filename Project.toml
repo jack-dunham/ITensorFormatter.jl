@@ -1,6 +1,6 @@
 name = "ITensorFormatter"
 uuid = "b6bf39f1-c9d3-4bad-aad8-593d802f65fd"
-version = "0.2.5"
+version = "0.2.6"
 authors = ["ITensor developers <support@itensor.org> and contributors"]
 
 [workspace]
@@ -11,11 +11,10 @@ JuliaFormatter = "98e50ef6-434e-11e9-1051-2b60c6c9e899"
 JuliaSyntax = "70703baa-626e-46a2-a12c-08ffd08c73b4"
 Runic = "62bfec6d-59d7-401d-8490-b29ee721c001"
 
-[apps]
-itfmt = {}
-
 [compat]
 JuliaFormatter = "2.3.0"
-JuliaSyntax = "0.4.10"
+JuliaSyntax = "0.4.10, 1"
 Runic = "1.5.1"
 julia = "1.10"
+
+[apps.itfmt]
