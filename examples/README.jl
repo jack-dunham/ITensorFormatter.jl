@@ -4,7 +4,7 @@
 # [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://itensor.github.io/ITensorFormatter.jl/dev/)
 # [![Build Status](https://github.com/ITensor/ITensorFormatter.jl/actions/workflows/Tests.yml/badge.svg?branch=main)](https://github.com/ITensor/ITensorFormatter.jl/actions/workflows/Tests.yml?query=branch%3Amain)
 # [![Coverage](https://codecov.io/gh/ITensor/ITensorFormatter.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/ITensor/ITensorFormatter.jl)
-# [![code style: runic](https://img.shields.io/badge/code_style-ITensor-purple)](https://github.com/ITensor/ITensorFormatter.jl)
+# [![Code Style](https://img.shields.io/badge/code_style-ITensor-purple)](https://github.com/ITensor/ITensorFormatter.jl)
 # [![Aqua](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
 # ITensorFormatter.jl is a code formatter for Julia source files used by packages in the
