@@ -185,7 +185,7 @@ function print_help()
         io, """
                `ITensorFormatter.main` (typically invoked as `julia -m ITensorFormatter`)
                formats Julia source code using the ITensorFormatter.jl formatter.
-        """,
+        """
     )
     printstyled(io, "OPTIONS"; bold = true)
     println(io)
@@ -200,7 +200,7 @@ function print_help()
 
                --version
                    Print ITensorFormatter and julia version information.
-        """,
+        """
     )
     return
 end
