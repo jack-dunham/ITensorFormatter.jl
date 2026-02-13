@@ -1,0 +1,9 @@
+- id: itensor-formatter
+  name: "ITensor Formatter"
+  entry: "itfmt"
+  pass_filenames: true
+  always_run: false
+  types: [file]
+  files: \.(jl|[jq]?md)$
+  language: "system"
+  description: "Code formatter for the ITensor ecosystem built on Runic and JuliaFormatter."

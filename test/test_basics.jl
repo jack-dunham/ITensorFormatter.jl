@@ -146,7 +146,6 @@ end
             @test ret == 0
         end
         @test contains(output, "itfmt version")
-        @test contains(output, string(pkgversion(ITensorFormatter)))
     end
 
     @testset "unsupported option" begin

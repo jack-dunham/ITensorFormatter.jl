@@ -1,6 +1,6 @@
 name = "ITensorFormatter"
 uuid = "b6bf39f1-c9d3-4bad-aad8-593d802f65fd"
-version = "0.2.4"
+version = "0.2.5"
 authors = ["ITensor developers <support@itensor.org> and contributors"]
 
 [workspace]
