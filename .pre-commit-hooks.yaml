@@ -1,6 +1,0 @@
-- id: "itensor-formatter"
-  name: "ITensor Pkg Formatter"
-  entry: "itpkgfmt ."
-  language: "system"
-  pass_filenames: false
-  description: "Code formatter for the ITensor ecosystem built on Runic and JuliaFormatter."
