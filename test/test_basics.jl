@@ -212,7 +212,27 @@ end
     end
 
     @testset "no arguments" begin
-        @test_throws ErrorException ITensorFormatter.main(String[])
+        mktempdir() do dir
+            _, fake_stdin = mktemp(dir)
+            _, fake_stdout = mktemp(dir)
+
+            redirect_stdio(; stdin = fake_stdin, stdout = fake_stdout) do
+                write(stdin, "using Zebra: z\nusing Alpha: a\nx = 1\n")
+                seek(stdin, 0)
+
+                ITensorFormatter.main(String[])
+
+                seek(stdout, 0)
+                result = read(stdout, String)
+
+                @test contains(result, "using Alpha: a")
+                @test contains(result, "using Zebra: z")
+                # Alpha should come before Zebra
+                @test findfirst("Alpha", result) < findfirst("Zebra", result)
+                # Non-import code preserved
+                @test contains(result, "x = 1")
+            end
+        end
     end
 
     @testset "nonexistent path" begin
