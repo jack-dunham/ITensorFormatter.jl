@@ -143,13 +143,25 @@ function process_args(argv)
     return (; paths, format, format_yaml)
 end
 
+function format_stdin()
+    content = read(stdin, String)
+    content = organize_import_blocks_string(content)
+    content = JuliaFormatter.format_text(content; JULIAFORMATTER_OPTIONS...)
+    content = Runic.format_string(content)
+    write(stdout, content)
+    return 0
+end
+
 """
 $(help_markdown())
 """
 function main(argv)
     (; paths, format, format_yaml) = process_args(argv)
     !format && return 0
-    isempty(paths) && return error("No input paths provided.")
+    if isempty(paths)
+        format_stdin()
+        return 0
+    end
     jlfiles = filterpaths(isjlfile, paths)
     yamlfiles = format_yaml ? filterpaths(isyamlfile, paths) : String[]
     projectomls = filterpaths(isprojecttoml, paths)
